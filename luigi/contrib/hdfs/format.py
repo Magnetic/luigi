@@ -50,8 +50,7 @@ class HdfsAtomicWritePipe(luigi.format.OutputPipeProcessWrapper):
     def close(self):
         super(HdfsAtomicWritePipe, self).close()
         try:
-            if exists(self.path):
-                remove(self.path)
+            remove(self.path)
         except Exception as ex:
             formatted_traceback = traceback.format_exc()
             logger.exception(
