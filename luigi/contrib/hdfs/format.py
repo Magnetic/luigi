@@ -1,3 +1,5 @@
+import traceback
+
 import luigi.format
 import logging
 import os
@@ -50,8 +52,12 @@ class HdfsAtomicWritePipe(luigi.format.OutputPipeProcessWrapper):
         try:
             if exists(self.path):
                 remove(self.path)
-        except HDFSCliError:
-            pass
+        except Exception as ex:
+            formatted_traceback = traceback.format_exc()
+            logger.exception(
+                "Atomic Hdfs close error for {} \n {}".format(self.path, formatted_traceback)
+            )
+
         if not all(result['result'] for result in rename(self.tmppath, self.path) or []):
             raise HdfsAtomicWriteError('Atomic write to {} failed'.format(self.path))
 
