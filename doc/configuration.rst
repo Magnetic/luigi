@@ -26,7 +26,11 @@ Default (cfg) parser are looked for in:
 * ``luigi.toml``
 * ``LUIGI_CONFIG_PATH`` environment variable
 
-Both config lists increase in priority (from low to high). The order only matters in case of key conflicts (see docs for ConfigParser.read_). These files are meant for both the client and ``luigid``. If you decide to specify your own configuration you should make sure that both the client and ``luigid`` load it properly.
+Both config lists increase in priority (from low to high). The order only
+matters in case of key conflicts (see docs for ConfigParser.read_).
+These files are meant for both the client and ``luigid``.
+If you decide to specify your own configuration you should make sure
+that both the client and ``luigid`` load it properly.
 
 .. _ConfigParser.read: https://docs.python.org/3.6/library/configparser.html#configparser.ConfigParser.read
 
@@ -54,6 +58,9 @@ Example toml config:
     [core]
     scheduler_host = "luigi-host.mycompany.foo"
 
+Also see `examples/config.toml
+<https://github.com/spotify/luigi/blob/master/examples/config.toml>`_
+for more complex example.
 
 .. _ParamConfigIngestion:
 
@@ -204,6 +211,51 @@ rpc-retry-wait
   connect to the central scheduler between two retry attempts.
   Defaults to 30
 
+
+[cors]
+------
+
+.. versionadded:: 2.8.0
+
+These parameters control ``/api/<method>`` ``CORS`` behaviour (see: `W3C Cross-Origin Resource Sharing
+<http://www.w3.org/TR/cors/>`_).
+
+enabled
+  Enables CORS support.
+  Defaults to false.
+
+allowed_origins
+  A list of allowed origins. Used only if ``allow_any_origin`` is false.
+  Configure in JSON array format, e.g. ["foo", "bar"].
+  Defaults to empty.
+
+allow_any_origin
+  Accepts requests from any origin.
+  Defaults to false.
+
+allow_null_origin
+  Allows the request to set ``null`` value of the ``Origin`` header.
+  Defaults to false.
+
+max_age
+  Content of ``Access-Control-Max-Age``.
+  Defaults to 86400 (24 hours).
+
+allowed_methods
+  Content of ``Access-Control-Allow-Methods``.
+  Defaults to ``GET, OPTIONS``.
+
+allowed_headers
+  Content of ``Access-Control-Allow-Headers``.
+  Defaults to ``Accept, Content-Type, Origin``.
+
+exposed_headers
+  Content of ``Access-Control-Expose-Headers``.
+  Defaults to empty string (will NOT be sent as a response header).
+
+allow_credentials
+  Indicates that the actual request can include user credentials.
+  Defaults to false.
 
 .. _worker-config:
 
@@ -610,7 +662,7 @@ is good practice to do so when you have a fixed set of resources.
 .. _retcode-config:
 
 [retcode]
-----------
+---------
 
 Configure return codes for the Luigi binary. In the case of multiple return
 codes that could apply, for example a failing task and missing data, the
@@ -762,6 +814,12 @@ send_messages
   When true, the scheduler is allowed to send messages to running tasks and
   the central scheduler provides a simple prompt per task to send messages.
   Defaults to true.
+
+metrics_collector
+  Optional setting allowing Luigi to use a contribution to collect metrics
+  about the pipeline to a third-party. By default this uses the default metric
+  collector that acts as a shell and does nothing. The only currently available
+  option is "datadog".
 
 
 [sendgrid]
@@ -936,6 +994,28 @@ client_type
   authentication. The other option is the "kerberos" client that uses kerberos
   authentication.
 
+[datadog]
+---------
+
+api_key
+  The api key found in the account settings of Datadog under the API
+  sections.
+app_key
+  The application key found in the account settings of Datadog under the API
+  sections.
+default_tags
+  Optional settings that adds the tag to all the metrics and events sent to
+  Datadog. Default value is "application:luigi".
+environment
+  Allows you to tweak multiple environment to differentiate between production,
+  staging or development metrics within Datadog. Default value is "development".
+statsd_host
+  The host that has the statsd instance to allow Datadog to send statsd metric. Default value is "localhost".
+statsd_port
+  The port on the host that allows connection to the statsd host. Defaults value is 8125.
+metric_namespace
+  Optional prefix to add to the beginning of every metric sent to Datadog.
+  Default value is "luigi".
 
 Per Task Retry-Policy
 ---------------------
